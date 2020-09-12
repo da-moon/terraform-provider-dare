@@ -5,4 +5,4 @@ RUN curl -fsSL \
     https://raw.githubusercontent.com/da-moon/core-utils/master/bin/fast-apt | sudo bash -s -- \
     --init || true;
 RUN curl -fsSL \
-    https://raw.githubusercontent.com/da-moon/core-utils/master/bin/get-hashi | sudo bash -s -- terraform
+    https://raw.githubusercontent.com/da-moon/core-utils/master/bin/get-hashi | sudo bash -s -- terraform || true;
