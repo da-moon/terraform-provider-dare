@@ -1,0 +1,82 @@
+{
+    "emeraldwalk.runonsave": {
+        "autoClearConsole": true,
+        "commands": [
+            {
+                "isAsync": true,
+                "cmd": "go mod tidy"
+            },
+            {
+                "match": "\\.go$",
+                "isAsync": true,
+                "cmd": "goimports -w ."
+            },
+            {
+                "match": "\\.go$",
+                "isAsync": true,
+                "cmd": "goformat -w ."
+            }
+        ]
+    },
+    "editor.formatOnSave": true,
+    "go.testFlags": [
+        "-v"
+    ],
+    "cSpell.words": [
+        "consectetur",
+        "adipiscing",
+        "elit",
+        "Proin",
+        "facilisis",
+        "sapien",
+        "accumsan",
+        "malesuada",
+        "augue",
+        "pulvinar",
+        "scelerisque",
+        "porttitor",
+        "augue",
+        "lacus",
+        "lobortis",
+        "morbi",
+        "tristique",
+        "senectus",
+        "feugiat",
+        "enim",
+        "euismod",
+        "elementum",
+        "ultricies",
+        "nunc",
+        "mauris",
+        "quisque",
+        "sollicitudin",
+        "tincidunt",
+        "arcu",
+        "quis",
+        "porta",
+        "justo",
+        "fringilla",
+        "vestibulum",
+        "Donec",
+        "faucibus",
+        "egestas",
+        "cursus",
+        "justo",
+        "urna",
+        "pellentesque",
+        "netus",
+        "metus",
+        "gravida",
+        "volutpat",
+        "hendrerit",
+        "laoreet",
+        "turpis",
+        "github",
+        "hashicorp",
+        "http",
+        "import",
+        "ioutil",
+        "package",
+        "palantir"
+    ]
+}
