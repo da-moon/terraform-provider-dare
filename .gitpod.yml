@@ -13,6 +13,6 @@ tasks:
       GO111MODULE=off go get -u -v github.com/eandre/discover/...  &&
       GO111MODULE=off go get -u -v honnef.co/go/tools/cmd/staticcheck &&
       cd $GOPATH/src/honnef.co/go/tools/cmd/staticcheck &&
-      git checkout 2019.2 &&
+      git checkout 2020.1.4 &&
       go get &&
       go install
