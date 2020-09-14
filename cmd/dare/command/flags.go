@@ -53,3 +53,13 @@ func DecryptOutputFlag(f *flag.FlagSet) *string {
 	return f.String("output", result,
 		"Path to store decrypted artifacts.")
 }
+
+// LogLevelFlag ...
+func LogLevelFlag(f *flag.FlagSet) *string {
+	result := os.Getenv("DARE_LOG_LEVEL")
+	if result == "" {
+		result = "INFO"
+	}
+	return f.String("log-level", result,
+		"flag used to indicate log level")
+}

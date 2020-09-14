@@ -4,8 +4,10 @@ go 1.15
 
 require (
 	github.com/da-moon/go-codec v0.0.1
+	github.com/da-moon/go-logger v0.0.1
 	github.com/da-moon/go-primitives v0.0.2
 	github.com/da-moon/version v0.0.0-20200911184515-f6b53b29feb0
+	github.com/hashicorp/logutils v1.0.0
 	github.com/hashicorp/terraform v0.13.2
 	github.com/mitchellh/cli v1.1.1
 	github.com/mitchellh/mapstructure v1.3.3 // indirect

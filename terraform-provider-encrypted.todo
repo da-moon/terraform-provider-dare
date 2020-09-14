@@ -1,0 +1,11 @@
+cmd:
+  dare:
+    ☐ read files in a directory function. allow wildcard based recursive search
+    ☐ encrypt command
+    ☐ overwrite file when encrypting/decrypting
+  terraform-provider-encrypted:
+    ☐ documentation
+pkg:
+  dare:
+    ☐ encryptfile function
+    ☐ decryptfile function

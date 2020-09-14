@@ -12,12 +12,8 @@ import (
 var Commands map[string]cli.CommandFactory
 
 func init() {
-	ui := &cli.PrefixedUi{
-		OutputPrefix: "==> ",
-		InfoPrefix:   "    ",
-		ErrorPrefix:  "==> [ERROR]",
-		Ui:           &cli.BasicUi{Writer: os.Stdout},
-	}
+
+	ui := &cli.BasicUi{Writer: os.Stdout}
 	Commands = map[string]cli.CommandFactory{
 
 		"keygen": func() (cli.Command, error) {

@@ -7,30 +7,36 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"os"
+	"log"
 	"strings"
 
+	logger "github.com/da-moon/go-logger"
 	primitives "github.com/da-moon/go-primitives"
-	dare "github.com/da-moon/terraform-provider-dare/pkg/dare"
-	hashsink "github.com/da-moon/terraform-provider-dare/pkg/hashsink"
-	model "github.com/da-moon/terraform-provider-dare/pkg/model"
+	logutils "github.com/hashicorp/logutils"
 	cli "github.com/mitchellh/cli"
-	stacktrace "github.com/palantir/stacktrace"
 )
 
 // EncryptCommand is a Command implementation that generates an encryption
 // key.
 type EncryptCommand struct {
-	args []string
-	Ui   cli.Ui
+	logFilter *logutils.LevelFilter
+	logger    *log.Logger
+	args      []string
+	Ui        cli.Ui
 }
 
 var _ cli.Command = &EncryptCommand{}
 
 // Run ...
 func (c *EncryptCommand) Run(args []string) int {
-	c.args = args
 	const entrypoint = "encrypt"
+	c.args = args
+	c.Ui = &cli.PrefixedUi{
+		OutputPrefix: "==> ",
+		InfoPrefix:   "    ",
+		ErrorPrefix:  "==> [ERROR]",
+		Ui:           c.Ui,
+	}
 	cmdFlags := flag.NewFlagSet(entrypoint, flag.ContinueOnError)
 	cmdFlags.Usage = func() { c.Ui.Info(c.Help()) }
 	var input []string
@@ -38,11 +44,18 @@ func (c *EncryptCommand) Run(args []string) int {
 	output := EncryptOutputFlag(cmdFlags)
 	masterKey := MasterKeyFlag(cmdFlags)
 	masterKeyFile := MasterKeyFileFlag(cmdFlags)
+	logLevel := LogLevelFlag(cmdFlags)
+
 	err := cmdFlags.Parse(c.args)
 	if err != nil {
 		c.Ui.Info(c.Help())
 		return 1
 	}
+	logGate, _, _ := c.setupLoggers(*logLevel)
+	c.Ui.Info("")
+	c.Ui.Output("Log data will now stream in as it occurs:\n")
+	logGate.Flush()
+
 	if len(input) == 0 {
 		c.Ui.Error("input value is needed")
 		c.Ui.Info(c.Help())
@@ -64,17 +77,20 @@ func (c *EncryptCommand) Run(args []string) int {
 			return 1
 		}
 		*masterKey = hex.EncodeToString(key[:])
-		c.Ui.Warn(fmt.Sprintf("No master key was provided. generated random key '%s'", *masterKey, err))
+		c.logger.Printf("[WARN] No master key was provided. generated random key '%s'", *masterKey)
 	}
 	if len(*output) == 0 {
 		c.Ui.Error("output value is needed")
 		c.Ui.Info(c.Help())
 		return 1
 	}
-	c.Ui.Output(fmt.Sprintf("input path : %v", input))
-	c.Ui.Output(fmt.Sprintf("output path : %s", *output))
-	c.Ui.Output(fmt.Sprintf("master key file: %s", *masterKeyFile))
-	c.Ui.Output(fmt.Sprintf("master key : %s", *masterKey))
+
+	c.logger.Printf("[INFO] encrypt: input path : %v", input)
+	c.logger.Printf("[INFO] encrypt: output path : %s", *output)
+	if len(*masterKeyFile) != 0 {
+		c.logger.Printf("[INFO] encrypt: master key file: %s", *masterKeyFile)
+	}
+	c.logger.Printf("[INFO] encrypt: master key : %s", *masterKey)
 	return 0
 }
 
@@ -112,62 +128,27 @@ Options:
 	return strings.TrimSpace(helpText)
 }
 
-// Encrypt - Implementation of Encrypt method for go engine
-func encrypt(masterkey, input, output string) (*model.EncryptResponse, error) {
-	result := &model.EncryptResponse{}
-	nonce, err := dare.RandomNonce()
-	if err != nil {
-		err = stacktrace.Propagate(err, "could not encrypt data due to failure in generating random nonce")
-		return nil, err
-	}
-	result.RandomNonce = hex.EncodeToString(nonce[:])
-	var key [32]byte
-	decoded, err := hex.DecodeString(masterkey)
-	if err != nil {
-		err = stacktrace.Propagate(err, "could not encrypt data due to failure in decoding encryption key")
-		return nil, err
-	}
-	if len(decoded) != 32 {
-		err = stacktrace.NewError("could not encrypt data since given encoded encryption key is %d bytes. We expect 32 byte keys", len(decoded))
-		return nil, err
-	}
-	copy(key[:], decoded[:32])
+func (c *EncryptCommand) setupLoggers(logLevel string) (*logger.GatedWriter, *logger.LogWriter, io.Writer) {
+	// Setup logging. First create the gated log writer, which will
+	// store logs until we're ready to show them. Then create the level
+	// filter, filtering logs of the specified level.
+	logGate := logger.NewGatedWriter(&cli.UiWriter{Ui: c.Ui})
 
-	fi, err := os.Stat(input)
-	if err == nil {
-		if fi.Size() == 0 {
-			os.Remove(input)
-			err = stacktrace.NewError("decryption failure due to file with empty size at '%v'", input)
-			return nil, err
-		}
+	c.logFilter = logger.LevelFilter()
+	c.logFilter.MinLevel = logutils.LogLevel(strings.ToUpper(logLevel))
+	c.logFilter.Writer = logGate
+	if !logger.ValidateLevelFilter(c.logFilter.MinLevel, c.logFilter) {
+		c.Ui.Error(fmt.Sprintf(
+			"Invalid log level: %s. Valid log levels are: %v",
+			c.logFilter.MinLevel, c.logFilter.Levels))
+		return nil, nil, nil
 	}
-	if err != nil {
-		err = stacktrace.Propagate(err, "could not stat src at '$v'", input)
-		return nil, err
-	}
-	srcFile, err := os.Open(input)
-	if err != nil {
-		err = stacktrace.Propagate(err, "could not encrypt due to failure in opening source file at %s", input)
-		return nil, err
-	}
-	defer srcFile.Close()
-	os.Remove(output)
-	destinationFile, err := os.Create(output)
-	if err != nil {
-		err = stacktrace.NewError("could not successfully create a new empty file for %s", output)
-		return nil, err
-	}
-	defer destinationFile.Close()
-	dstWriter := hashsink.NewWriter(destinationFile)
-	err = dare.EncryptWithWriter(dstWriter, srcFile, key, nonce)
-	if err != nil {
-		err = stacktrace.Propagate(err, "Could not Encrypt file at '%s' and store it in '%s' ", input, output)
-		return nil, err
-	}
-	result.OutputHash = &model.Hash{
-		Path:   output,
-		Md5:    dstWriter.MD5HexString(),
-		Sha256: dstWriter.SHA256HexString(),
-	}
-	return result, nil
+
+	// Create a log writer, and wrap a logOutput around it
+	logWriter := logger.NewLogWriter(512)
+	var logOutput io.Writer
+	logOutput = io.MultiWriter(c.logFilter, logWriter)
+	// Create a logger
+	c.logger = log.New(logOutput, "", log.LstdFlags)
+	return logGate, logWriter, logOutput
 }
