@@ -24,9 +24,6 @@ func DDPathFlag(f *flag.FlagSet) *string {
 // MasterKeyFlag ...
 func MasterKeyFlag(f *flag.FlagSet) *string {
 	result := os.Getenv("DARE_MASTER_KEY")
-	if result == "" {
-		result = "b6c4bba7a385aef779965cb0b7d66316ab091704042606797871"
-	}
 	return f.String("master-key", result,
 		"Master Key used in encryption-decryption process.")
 }
@@ -40,8 +37,7 @@ func MasterKeyFileFlag(f *flag.FlagSet) *string {
 
 // EncryptOutputFlag ...
 func EncryptOutputFlag(f *flag.FlagSet) *string {
-	dir, _ := os.Getwd()
-	result := primitives.PathJoin(dir, "encrypted")
+	var result string
 	return f.String("output", result,
 		"Path to store encrypted artifacts.")
 }
@@ -62,4 +58,11 @@ func LogLevelFlag(f *flag.FlagSet) *string {
 	}
 	return f.String("log-level", result,
 		"flag used to indicate log level")
+}
+
+// RegexFlag ...
+func RegexFlag(f *flag.FlagSet) *string {
+	var result string
+	return f.String("regex", result,
+		"regex used for recursive file search")
 }
