@@ -7,8 +7,8 @@ import (
 	"io"
 	"testing"
 
-	decryptor "github.com/da-moon/terraform-provider-dare/pkg/dare/decryptor"
-	encryptor "github.com/da-moon/terraform-provider-dare/pkg/dare/encryptor"
+	decryptor "github.com/da-moon/terraform-provider-dare/internal/dare/decryptor"
+	encryptor "github.com/da-moon/terraform-provider-dare/internal/dare/encryptor"
 	assert "github.com/stretchr/testify/assert"
 )
 

@@ -52,3 +52,4 @@ MShutdownA = 5
 CYAN = 6
 WHITE = 7
 
+SHELL := /bin/bash

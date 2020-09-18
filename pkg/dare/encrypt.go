@@ -4,9 +4,11 @@ import (
 	"encoding/hex"
 	"io"
 	"os"
+	"path/filepath"
 
-	config "github.com/da-moon/terraform-provider-dare/pkg/dare/config"
-	encryptor "github.com/da-moon/terraform-provider-dare/pkg/dare/encryptor"
+	"github.com/da-moon/go-files"
+	config "github.com/da-moon/terraform-provider-dare/internal/dare/config"
+	encryptor "github.com/da-moon/terraform-provider-dare/internal/dare/encryptor"
 	"github.com/da-moon/terraform-provider-dare/pkg/hashsink"
 	"github.com/da-moon/terraform-provider-dare/pkg/model"
 	"github.com/palantir/stacktrace"
@@ -27,10 +29,12 @@ func EncryptWithWriter(
 		if err == io.EOF {
 			break
 		} else if err != nil {
+			err = stacktrace.Propagate(err, "could not read from source")
 			return err
 		}
 		_, err = encWriter.Write(buffer[:bytesRead])
 		if err != nil {
+			err = stacktrace.Propagate(err, "could not write to destination")
 			return err
 		}
 	}
@@ -38,61 +42,50 @@ func EncryptWithWriter(
 }
 
 // EncryptFile encrypts a given file and store it at a given path
-func EncryptFile(masterkey, input, output string) (*model.EncryptResponse, error) {
-	result := &model.EncryptResponse{}
-	nonce, err := RandomNonce()
+func EncryptFile(r *model.EncryptRequest) (*model.EncryptResponse, error) {
+	var err error
+	if r == nil {
+		err = stacktrace.NewError("nil request")
+		return nil, err
+	}
+	err = r.Sanitize()
 	if err != nil {
-		err = stacktrace.Propagate(err, "could not encrypt data due to failure in generating random nonce")
+		err = stacktrace.Propagate(err, "could not sanitize request")
 		return nil, err
 	}
-	result.RandomNonce = hex.EncodeToString(nonce[:])
-	var key [32]byte
-	decoded, err := hex.DecodeString(masterkey)
-	if err != nil {
-		err = stacktrace.Propagate(err, "could not encrypt data due to failure in decoding encryption key")
-		return nil, err
-	}
-	if len(decoded) != 32 {
-		err = stacktrace.NewError("could not encrypt data since given encoded encryption key is %d bytes. We expect 32 byte keys", len(decoded))
-		return nil, err
-	}
-	copy(key[:], decoded[:32])
-
-	fi, err := os.Stat(input)
-	if err == nil {
-		if fi.Size() == 0 {
-			os.Remove(input)
-			err = stacktrace.NewError("decryption failure due to file with empty size at '%v'", input)
+	result := r.Response()
+	result.RandomNonce = hex.EncodeToString(r.Nonce[:])
+	for k, v := range r.Targets {
+		srcFile, _, err := files.SafeOpenPath(k)
+		if err != nil {
+			err = stacktrace.Propagate(err, "could not encrypt '%s'", k)
 			return nil, err
 		}
+		defer srcFile.Close()
+
+		os.Remove(v)
+		files.MkdirAll(filepath.Dir(v))
+		destinationFile, err := os.Create(v)
+		if err != nil {
+			err = stacktrace.NewError("could not successfully create a new empty file for %s", v)
+			return nil, err
+		}
+		defer destinationFile.Close()
+		dstWriter := hashsink.NewWriter(destinationFile)
+		err = EncryptWithWriter(dstWriter, srcFile, r.Key, r.Nonce)
+		if err != nil {
+			err = stacktrace.Propagate(err, "Could not Encrypt file at '%s' and store it in '%s' ", k, v)
+			return nil, err
+		}
+		result.EncryptedArtifacts[v] = model.Hash{
+			Md5:    dstWriter.MD5HexString(),
+			Sha256: dstWriter.SHA256HexString(),
+		}
 	}
+	err = result.Sanitize()
 	if err != nil {
-		err = stacktrace.Propagate(err, "could not stat src at '$v'", input)
+		err = stacktrace.Propagate(err, "could not Sanitize Encrypt Response")
 		return nil, err
-	}
-	srcFile, err := os.Open(input)
-	if err != nil {
-		err = stacktrace.Propagate(err, "could not encrypt due to failure in opening source file at %s", input)
-		return nil, err
-	}
-	defer srcFile.Close()
-	os.Remove(output)
-	destinationFile, err := os.Create(output)
-	if err != nil {
-		err = stacktrace.NewError("could not successfully create a new empty file for %s", output)
-		return nil, err
-	}
-	defer destinationFile.Close()
-	dstWriter := hashsink.NewWriter(destinationFile)
-	err = EncryptWithWriter(dstWriter, srcFile, key, nonce)
-	if err != nil {
-		err = stacktrace.Propagate(err, "Could not Encrypt file at '%s' and store it in '%s' ", input, output)
-		return nil, err
-	}
-	result.OutputHash = &model.Hash{
-		Path:   output,
-		Md5:    dstWriter.MD5HexString(),
-		Sha256: dstWriter.SHA256HexString(),
 	}
 	return result, nil
 }

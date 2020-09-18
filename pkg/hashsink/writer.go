@@ -29,7 +29,7 @@ func NewWriter(
 	}
 }
 
-// Read ...
+// Write ...
 func (w *Writer) Write(p []byte) (n int, err error) {
 	n, err = w.writer.Write(p)
 	if n > 0 {

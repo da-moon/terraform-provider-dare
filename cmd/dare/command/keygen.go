@@ -12,7 +12,7 @@ import (
 // KeygenCommand is a Command implementation that generates an encryption
 // key.
 type KeygenCommand struct {
-	Ui cli.Ui
+	UI cli.Ui
 }
 
 var _ cli.Command = &KeygenCommand{}
@@ -23,14 +23,14 @@ func (c *KeygenCommand) Run(_ []string) int {
 	key := make([]byte, length)
 	n, err := rand.Reader.Read(key)
 	if err != nil {
-		c.Ui.Error(fmt.Sprintf("could not read random data: %s", err))
+		c.UI.Error(fmt.Sprintf("could not read random data: %s", err))
 		return 1
 	}
 	if n != length {
-		c.Ui.Error(fmt.Sprintf("could not read enough entropy. Generate more entropy!"))
+		c.UI.Error("could not read enough entropy. Generate more entropy!")
 		return 1
 	}
-	c.Ui.Output(hex.EncodeToString(key))
+	c.UI.Output(hex.EncodeToString(key))
 	return 0
 }
 

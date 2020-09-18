@@ -11,7 +11,7 @@ import (
 type VersionCommand struct {
 	Revision string
 	Version  string
-	Ui       cli.Ui
+	UI       cli.Ui
 }
 
 var _ cli.Command = &VersionCommand{}
@@ -33,6 +33,6 @@ func (c *VersionCommand) Run(_ []string) int {
 	if c.Revision != "" {
 		fmt.Fprintf(&versionString, " (%s)", c.Revision)
 	}
-	c.Ui.Output(versionString.String())
+	c.UI.Output(versionString.String())
 	return 0
 }

@@ -20,66 +20,66 @@ import (
 // key.
 type DDCommand struct {
 	args []string
-	Ui   cli.Ui
+	UI   cli.Ui
 }
 
 var _ cli.Command = &DDCommand{}
 
 // Run ...
 func (c *DDCommand) Run(args []string) int {
-	c.Ui = &cli.PrefixedUi{
+	c.UI = &cli.PrefixedUi{
 		OutputPrefix: "==> ",
-		Ui:           c.Ui,
+		Ui:           c.UI,
 	}
 
 	c.args = args
 	const entrypoint = "dd"
 	cmdFlags := flag.NewFlagSet(entrypoint, flag.ContinueOnError)
-	cmdFlags.Usage = func() { c.Ui.Info(c.Help()) }
+	cmdFlags.Usage = func() { c.UI.Info(c.Help()) }
 	sizeString := DDSizeFlag(cmdFlags)
 	pathString := DDPathFlag(cmdFlags)
 	err := cmdFlags.Parse(c.args)
 	if err != nil {
-		c.Ui.Info(c.Help())
+		c.UI.Info(c.Help())
 		return 1
 	}
 	if len(*sizeString) == 0 {
-		c.Ui.Error("size value is needed")
-		c.Ui.Info(c.Help())
+		c.UI.Error("size value is needed")
+		c.UI.Info(c.Help())
 		return 1
 	}
 	if len(*pathString) == 0 {
-		c.Ui.Error("path value is needed")
-		c.Ui.Info(c.Help())
+		c.UI.Error("path value is needed")
+		c.UI.Info(c.Help())
 		return 1
 	}
 	parsedSize, err := primitives.FileSizeStringToInt(*sizeString)
 	if err != nil {
-		c.Ui.Error(fmt.Sprintf("could not parse given size: %s", err))
-		c.Ui.Info(c.Help())
+		c.UI.Error(fmt.Sprintf("could not parse given size: %s", err))
+		c.UI.Info(c.Help())
 		return 1
 	}
 	os.Remove(*pathString)
 	result, err := createRandomFile(*pathString, int(parsedSize))
 	if err != nil {
-		c.Ui.Error(fmt.Sprintf("could not create random file: %s", err))
-		c.Ui.Info(c.Help())
+		c.UI.Error(fmt.Sprintf("could not create random file: %s", err))
+		c.UI.Info(c.Help())
 		return 1
 	}
 	if result == nil {
-		c.Ui.Error("could not create random file")
-		c.Ui.Info(c.Help())
+		c.UI.Error("could not create random file")
+		c.UI.Info(c.Help())
 		return 1
 	}
 	err = result.Sanitize()
 	if err != nil {
-		c.Ui.Error(fmt.Sprintf("there were an issue with random file metadata: %s", err))
-		c.Ui.Info(c.Help())
+		c.UI.Error(fmt.Sprintf("there were an issue with random file metadata: %s", err))
+		c.UI.Info(c.Help())
 		return 1
 	}
-	c.Ui.Output(fmt.Sprintf("output path : %s", *pathString))
-	c.Ui.Output(fmt.Sprintf("MD5 Hash : %s", result.Md5))
-	c.Ui.Output(fmt.Sprintf("SHA256 Hash : %s", result.Sha256))
+	c.UI.Output(fmt.Sprintf("output path : %s", *pathString))
+	c.UI.Output(fmt.Sprintf("MD5 Hash : %s", result.Md5))
+	c.UI.Output(fmt.Sprintf("SHA256 Hash : %s", result.Sha256))
 	return 0
 }
 
@@ -122,7 +122,6 @@ func createRandomFile(path string, maxSize int) (*model.Hash, error) {
 		hashWriter.Write([]byte(enc))
 	}
 	result := &model.Hash{
-		Path:   path,
 		Md5:    hashWriter.MD5HexString(),
 		Sha256: hashWriter.SHA256HexString(),
 	}

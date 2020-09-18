@@ -3,9 +3,16 @@ cmd:
     ☐ read files in a directory function. allow wildcard based recursive search
     ☐ encrypt command
     ☐ overwrite file when encrypting/decrypting
+    ☐ make the cli a drop-in replacement for ansible-vault
   terraform-provider-encrypted:
     ☐ documentation
 pkg:
   dare:
     ✔ encryptfile function @done (9/14/2020, 4:20:26 PM)
     ☐ decryptfile function
+  model:
+    ☐ encrypt
+    ✔ file @done (9/15/2020, 2:32:19 AM)
+    ✔ key @done (9/15/2020, 2:32:20 AM)
+    ☐ decrypt
+    ☐ hash

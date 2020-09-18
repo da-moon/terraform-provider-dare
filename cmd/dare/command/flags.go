@@ -66,3 +66,10 @@ func RegexFlag(f *flag.FlagSet) *string {
 	return f.String("regex", result,
 		"regex used for recursive file search")
 }
+
+// NonceFlag ...
+func NonceFlag(f *flag.FlagSet) *string {
+	result := os.Getenv("DARE_NONCE")
+	return f.String("nonce", result,
+		"random initial nonce used when encrypting artifacts")
+}

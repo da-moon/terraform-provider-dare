@@ -13,24 +13,33 @@ var Commands map[string]cli.CommandFactory
 
 func init() {
 
-	ui := &cli.BasicUi{Writer: os.Stdout}
+	ui := &cli.BasicUi{
+		Reader:      os.Stdin,
+		Writer:      os.Stdout,
+		ErrorWriter: os.Stderr,
+	}
 	Commands = map[string]cli.CommandFactory{
 
 		"keygen": func() (cli.Command, error) {
 			return &command.KeygenCommand{
-				Ui: ui,
+				UI: ui,
 			}, nil
 		},
 		"encrypt": func() (cli.Command, error) {
 			return &command.EncryptCommand{
-				Ui: ui,
+				UI: ui,
+			}, nil
+		},
+		"decrypt": func() (cli.Command, error) {
+			return &command.DecryptCommand{
+				UI: ui,
 			}, nil
 		},
 		"version": func() (cli.Command, error) {
 			return &command.VersionCommand{
 				Revision: version.Revision,
 				Version:  version.Version,
-				Ui:       ui,
+				UI:       ui,
 			}, nil
 		},
 	}

@@ -1,104 +1,156 @@
 package model
 
 import (
-	"log"
+	"encoding/hex"
+	"fmt"
 	"path/filepath"
 
+	files "github.com/da-moon/go-files"
 	logger "github.com/da-moon/go-logger"
-	"github.com/da-moon/go-primitives"
+	primitives "github.com/da-moon/go-primitives"
 	stacktrace "github.com/palantir/stacktrace"
 )
 
 // EncryptRequest ...
 type EncryptRequest struct {
-	Key    Key                   `json:"key,omitempty"`
-	Files  []File                `json:"files,omitempty"`
-	UUID   string                `json:"uuid,omitempty"`
-	logger *logger.WrappedLogger `json:"-"`
+	Targets             map[string]string     `json:"targets,omitempty"`
+	UUID                string                `json:"uuid,omitempty"`
+	DestinationRootPath string                `json:"destination_root_path,omitempty"`
+	Key                 [32]byte              `json:"-"`
+	Nonce               [24]byte              `json:"-"`
+	logger              *logger.WrappedLogger `json:"-"`
+}
+
+// NewEncryptRequest adds a target path to encrypt
+func (k *Key) NewEncryptRequest(source, destinationRoot, regex string) (*EncryptRequest, error) {
+	// src path => dst path
+	var err error
+	source, err = filepath.Abs(source)
+	if err != nil {
+		err = stacktrace.Propagate(err, "could not get aboslute path for source path of '%v'", source)
+		return nil, err
+	}
+	key, err := k.GetEncryptionKey()
+	if err != nil {
+		err = stacktrace.Propagate(err, "could not extract encryption key")
+		return nil, err
+	}
+	nonce, err := k.GetNonce()
+	if err != nil {
+		err = stacktrace.Propagate(err, "could not extract nonce")
+		return nil, err
+	}
+	r := &EncryptRequest{
+		UUID:                k.UUID,
+		logger:              k.logger,
+		DestinationRootPath: destinationRoot,
+		Targets:             make(map[string]string),
+		Key:                 key,
+		Nonce:               nonce,
+	}
+
+	f, fi, err := files.OpenPath(source)
+	if err != nil {
+		err = stacktrace.Propagate(err, "could not open '%s'", source)
+		return nil, err
+	}
+	defer f.Close()
+	if !fi.IsDir() {
+		parent := filepath.Dir(source)
+		r.Targets[source] = primitives.PathJoin(parent, filepath.Base(source)+".enc")
+	} else {
+		files, err := files.ReadDirFiles(source, regex)
+		if err != nil {
+			err = stacktrace.Propagate(err, "could search '%s' for '%s' pattern", source, regex)
+			return nil, err
+		}
+		for _, v := range files {
+			v = primitives.PathJoin(source, v)
+			parent := filepath.Dir(v)
+			value := primitives.PathJoin(parent, filepath.Base(v)+".enc")
+			r.Targets[v] = value
+			r.logger.Trace("new-encrypt-request: %s=>%s", v, value)
+		}
+	}
+	return r, nil
 }
 
 // Sanitize ...
-func (r *EncryptRequest) Sanitize(l *log.Logger, uuid string) error {
+func (r *EncryptRequest) Sanitize() error {
 	var err error
-	if l == nil {
+	if r.logger == nil {
 		err = stacktrace.NewError("logger was nil")
 		return err
 	}
-	r.UUID = uuid
-	r.logger = logger.NewWrappedLogger(l)
-	err = r.Key.Sanitize(r.logger, uuid)
-	if err != nil {
-		err = stacktrace.Propagate(err, "encrypt-request: could not sanitize keys", uuid)
+	if len(r.Targets) == 0 {
+		err = stacktrace.NewError("input path is empty")
 		return err
 	}
-
-	if len(r.Files) == 0 {
-		err = stacktrace.NewError("encrypt-request: files to process list is empty", uuid)
-		return err
-	}
-	for _, v := range r.Files {
-		err = v.Sanitize(r.logger, uuid)
+	// appending destination root path if exists
+	if len(r.DestinationRootPath) != 0 {
+		r.DestinationRootPath, err = filepath.Abs(r.DestinationRootPath)
 		if err != nil {
-			err = stacktrace.Propagate(err, "encrypt-request: could not sanitize files list", uuid)
+			err = stacktrace.Propagate(err, "could not get aboslute path for destination root path of '%v'", r.DestinationRootPath)
 			return err
+		}
+
+		for k, v := range r.Targets {
+			delete(r.Targets, k)
+			value := primitives.PathJoin(r.DestinationRootPath, v)
+			r.Targets[k] = value
+			r.logger.Trace("encrypt-request-sanitize: %s=>%s", k, value)
 		}
 	}
 	return nil
 }
 
-// AddTarget adds a target file to encrypt
-func (r *EncryptRequest) AddTarget(source, destination, regex string) {
-	if r.Files == nil {
-		r.Files = make([]File, 0)
-	}
-	f, fi, err := primitives.OpenPath(source)
-	if err != nil {
-		r.logger.Error("[%s] encrypt-request => could not open '%s' : '%v'", r.UUID, source, err)
-		return
-	}
-	defer f.Close()
-	if !fi.IsDir() {
-		if filepath.Ext(source) != "enc" {
-			parent := filepath.Dir(source)
-			if len(destination) != 0 {
-				parent = primitives.PathJoin(destination, parent)
-			}
-			r.Files = append(r.Files, File{
-				Source:      source,
-				Destination: primitives.PathJoin(parent, filepath.Base(source)+".enc"),
-			})
-		}
-	} else {
-		files, err := primitives.FindFile(source, regex)
-		if err != nil {
-			r.logger.Error("[%s] encrypt-request => could search '%s' for '%s' pattern : '%v'", r.UUID, source, regex, err)
-			return
-		}
-		for _, v := range files {
-			if filepath.Ext(source) != "enc" {
-				parent := filepath.Dir(v)
-				if len(destination) != 0 {
-					parent = primitives.PathJoin(destination, parent)
-				}
-				r.Files = append(r.Files, File{
-					Source:      v,
-					Destination: primitives.PathJoin(parent, filepath.Base(v)+".enc"),
-				})
-			}
-		}
-	}
-}
-
 // EncryptResponse ...
 type EncryptResponse struct {
-	OutputHash  *Hash  `json:"output_hash,omitempty"`
-	RandomNonce string `json:"random_nonce,omitempty"`
-	RandomKey   string `json:"random_key,omitempty"`
+	EncryptedArtifacts map[string]Hash       `json:"encrypted_artifacts,omitempty"`
+	RandomNonce        string                `json:"random_nonce,omitempty"`
+	UUID               string                `json:"uuid,omitempty"`
+	logger             *logger.WrappedLogger `json:"-"`
 }
 
-// func (r *EncryptResponse) Sanitize(logger *log.Logger) error {
-// 	var err error
-// 	if len(r.Source) == 0 {
-// 		err = stacktrace.NewError("input path for ")
-// 	}
-// }
+// Response ...
+func (r *EncryptRequest) Response() *EncryptResponse {
+
+	return &EncryptResponse{
+		UUID:               r.UUID,
+		logger:             r.logger,
+		EncryptedArtifacts: make(map[string]Hash),
+		RandomNonce:        hex.EncodeToString(r.Nonce[:]),
+	}
+}
+
+// Sanitize ...
+func (r *EncryptResponse) Sanitize() error {
+	var err error
+	if r.logger == nil {
+		err = stacktrace.NewError("logger was nil")
+		return err
+	}
+	if len(r.RandomNonce) == 0 {
+		err = stacktrace.NewError("random nonce for encrypt response is empty")
+		return err
+	}
+	for k, v := range r.EncryptedArtifacts {
+		if len(k) == 0 {
+			err = stacktrace.NewError("output path for encrypt response is empty")
+			return err
+		}
+		err = v.Sanitize()
+		if err != nil {
+			err = stacktrace.Propagate(err, "could not Sanitize Hash")
+			return err
+		}
+	}
+	return nil
+}
+func (r *EncryptResponse) String() []string {
+	result := []string{"- UUID:" + r.UUID, "- RandomNonce:" + r.RandomNonce, "- encrypted artifacts:"}
+	for k, v := range r.EncryptedArtifacts {
+		result = append(result, fmt.Sprintf("%s=>{md5: '%s' | sha256: '%s'}", k, v.Md5, v.Sha256))
+	}
+	return result
+}
