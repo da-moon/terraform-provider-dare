@@ -3,6 +3,7 @@ package model
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	files "github.com/da-moon/go-files"
 	logger "github.com/da-moon/go-logger"
@@ -55,7 +56,10 @@ func (k *Key) NewDecryptRequest(source, destinationRoot string) (*DecryptRequest
 	defer f.Close()
 	if !fi.IsDir() {
 		parent := filepath.Dir(source)
-		r.Targets[source] = primitives.PathJoin(parent, filepath.Base(source))
+		r.logger.Trace("new-decrypt-request origin-base : %s=>%s", source, filepath.Base(source))
+		value := primitives.PathJoin(parent, strings.TrimSuffix(filepath.Base(source), ".enc"))
+		r.Targets[source] = value
+		r.logger.Trace("new-decrypt-request: %s=>%s", source, value)
 	} else {
 		files, err := files.ReadDirFiles(source, "*.enc")
 		if err != nil {
@@ -65,7 +69,7 @@ func (k *Key) NewDecryptRequest(source, destinationRoot string) (*DecryptRequest
 		for _, v := range files {
 			v = primitives.PathJoin(source, v)
 			parent := filepath.Dir(v)
-			value := primitives.PathJoin(parent, filepath.Base(v))
+			value := primitives.PathJoin(parent, strings.TrimSuffix(filepath.Base(v), ".enc"))
 			r.Targets[v] = value
 			r.logger.Trace("new-decrypt-request: %s=>%s", v, value)
 		}

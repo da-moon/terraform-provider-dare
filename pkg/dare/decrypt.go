@@ -67,7 +67,7 @@ func DecryptFile(r *model.DecryptRequest) (*model.DecryptResponse, error) {
 		}
 		defer destinationFile.Close()
 		dstWriter := hashsink.NewWriter(destinationFile)
-		err = EncryptWithWriter(dstWriter, srcFile, r.Key, r.Nonce)
+		err = DecryptWithWriter(dstWriter, srcFile, r.Key, r.Nonce)
 		if err != nil {
 			err = stacktrace.Propagate(err, "Could not decrypt file at '%s' and store it in '%s' ", k, v)
 			return nil, err

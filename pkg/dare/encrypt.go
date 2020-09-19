@@ -6,12 +6,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/da-moon/go-files"
+	files "github.com/da-moon/go-files"
 	config "github.com/da-moon/terraform-provider-dare/internal/dare/config"
 	encryptor "github.com/da-moon/terraform-provider-dare/internal/dare/encryptor"
-	"github.com/da-moon/terraform-provider-dare/pkg/hashsink"
-	"github.com/da-moon/terraform-provider-dare/pkg/model"
-	"github.com/palantir/stacktrace"
+	hashsink "github.com/da-moon/terraform-provider-dare/pkg/hashsink"
+	model "github.com/da-moon/terraform-provider-dare/pkg/model"
+	stacktrace "github.com/palantir/stacktrace"
 )
 
 // EncryptWithWriter encrypts data with a passed key as it is writing it

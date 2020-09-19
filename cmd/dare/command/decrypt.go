@@ -44,7 +44,7 @@ func (c *DecryptCommand) Run(args []string) int {
 	// that we are parsing cmd flags.
 	var inputs []string
 	cmdFlags.Var((*primitives.AppendSliceValue)(&inputs), "input", "file or directory to decrypt")
-	output := DecryptOutputFlag(cmdFlags)
+	output := OutputFlag(cmdFlags)
 	masterKey := MasterKeyFlag(cmdFlags)
 	masterKeyFile := MasterKeyFileFlag(cmdFlags)
 	logLevel := LogLevelFlag(cmdFlags)

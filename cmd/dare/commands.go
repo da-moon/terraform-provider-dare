@@ -19,7 +19,11 @@ func init() {
 		ErrorWriter: os.Stderr,
 	}
 	Commands = map[string]cli.CommandFactory{
-
+		"dd": func() (cli.Command, error) {
+			return &command.DDCommand{
+				UI: ui,
+			}, nil
+		},
 		"keygen": func() (cli.Command, error) {
 			return &command.KeygenCommand{
 				UI: ui,

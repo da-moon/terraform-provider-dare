@@ -3,8 +3,6 @@ package command
 import (
 	"flag"
 	"os"
-
-	"github.com/da-moon/go-primitives"
 )
 
 // DDSizeFlag ...
@@ -35,19 +33,11 @@ func MasterKeyFileFlag(f *flag.FlagSet) *string {
 		"plain text file holding Master Key used in encryption-decryption process.")
 }
 
-// EncryptOutputFlag ...
-func EncryptOutputFlag(f *flag.FlagSet) *string {
+// OutputFlag ...
+func OutputFlag(f *flag.FlagSet) *string {
 	var result string
 	return f.String("output", result,
-		"Path to store encrypted artifacts.")
-}
-
-// DecryptOutputFlag ...
-func DecryptOutputFlag(f *flag.FlagSet) *string {
-	dir, _ := os.Getwd()
-	result := primitives.PathJoin(dir, "decrypted")
-	return f.String("output", result,
-		"Path to store decrypted artifacts.")
+		"Path to store processed (encrypted/decrypted) artifacts.")
 }
 
 // LogLevelFlag ...
