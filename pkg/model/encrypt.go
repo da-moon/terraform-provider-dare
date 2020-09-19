@@ -13,12 +13,12 @@ import (
 
 // EncryptRequest ...
 type EncryptRequest struct {
-	Targets             map[string]string     `json:"targets,omitempty"`
-	UUID                string                `json:"uuid,omitempty"`
-	DestinationRootPath string                `json:"destination_root_path,omitempty"`
-	Key                 [32]byte              `json:"-"`
-	Nonce               [24]byte              `json:"-"`
-	logger              *logger.WrappedLogger `json:"-"`
+	Targets             map[string]string     `json:"targets,omitempty" mapstructure:"targets,omitempty"`
+	UUID                string                `json:"uuid,omitempty" mapstructure:"uuid,omitempty"`
+	DestinationRootPath string                `json:"destination_root_path,omitempty" mapstructure:"destination_root_path,omitempty"`
+	Key                 [32]byte              `json:"-" `
+	Nonce               [24]byte              `json:"-" `
+	logger              *logger.WrappedLogger `json:"-" `
 }
 
 // NewEncryptRequest adds a target path to encrypt
@@ -106,10 +106,10 @@ func (r *EncryptRequest) Sanitize() error {
 
 // EncryptResponse ...
 type EncryptResponse struct {
-	EncryptedArtifacts map[string]Hash       `json:"encrypted_artifacts,omitempty"`
-	RandomNonce        string                `json:"random_nonce,omitempty"`
-	UUID               string                `json:"uuid,omitempty"`
-	logger             *logger.WrappedLogger `json:"-"`
+	EncryptedArtifacts map[string]Hash       `json:"encrypted_artifacts,omitempty" mapstructure:"encrypted_artifacts,omitempty"`
+	RandomNonce        string                `json:"random_nonce,omitempty" mapstructure:"random_nonce,omitempty"`
+	UUID               string                `json:"uuid,omitempty" mapstructure:"uuid,omitempty"`
+	logger             *logger.WrappedLogger `json:"-" `
 }
 
 // Response ...

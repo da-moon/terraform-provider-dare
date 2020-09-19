@@ -13,9 +13,9 @@ import (
 
 // DecryptRequest ...
 type DecryptRequest struct {
-	Targets             map[string]string     `json:"targets,omitempty"`
-	UUID                string                `json:"uuid,omitempty"`
-	DestinationRootPath string                `json:"destination_root_path,omitempty"`
+	Targets             map[string]string     `json:"targets,omitempty" mapstructure:"targets,omitempty"`
+	UUID                string                `json:"uuid,omitempty" mapstructure:"uuid,omitempty"`
+	DestinationRootPath string                `json:"destination_root_path,omitempty" mapstructure:"destination_root_path,omitempty"`
 	logger              *logger.WrappedLogger `json:"-"`
 	Key                 [32]byte
 	Nonce               [24]byte
@@ -108,9 +108,9 @@ func (r *DecryptRequest) Sanitize() error {
 
 // DecryptResponse ...
 type DecryptResponse struct {
-	DecryptedArtifacts map[string]Hash       `json:"decrypted_artifacts,omitempty"`
-	UUID               string                `json:"uuid,omitempty"`
-	logger             *logger.WrappedLogger `json:"-"`
+	DecryptedArtifacts map[string]Hash       `json:"decrypted_artifacts,omitempty" mapstructure:"decrypted_artifacts,omitempty"`
+	UUID               string                `json:"uuid,omitempty" mapstructure:"uuid,omitempty"`
+	logger             *logger.WrappedLogger `json:"-" mapstructure:"-"`
 }
 
 // Response ...

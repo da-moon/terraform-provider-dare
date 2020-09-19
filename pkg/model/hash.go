@@ -4,8 +4,8 @@ import "github.com/palantir/stacktrace"
 
 // Hash stores file hash values
 type Hash struct {
-	Md5    string `json:"md5,omitempty"`
-	Sha256 string `json:"sha256,omitempty"`
+	Md5    string `json:"md5,omitempty" mapstructure:"md5,omitempty"`
+	Sha256 string `json:"sha256,omitempty" mapstructure:"sha256,omitempty"`
 }
 
 // Sanitize checks for unacceptable values

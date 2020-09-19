@@ -17,11 +17,11 @@ type KeyOption func(*Key) error
 
 // Key ...
 type Key struct {
-	Targets             map[string]string     `json:"targets,omitempty"`
-	UUID                string                `json:"uuid,omitempty"`
-	DestinationRootPath string                `json:"destination_root_path,omitempty"`
-	EncryptionKey       string                `json:"encryption_key,omitempty"`
-	Nonce               string                `json:"nonce,omitempty"`
+	Targets             map[string]string     `json:"targets,omitempty" mapstructure:"targets,omitempty"`
+	UUID                string                `json:"uuid,omitempty" mapstructure:"uuid,omitempty"`
+	DestinationRootPath string                `json:"destination_root_path,omitempty" mapstructure:"destination_root_path,omitempty"`
+	EncryptionKey       string                `json:"encryption_key,omitempty" mapstructure:"encryption_key,omitempty"`
+	Nonce               string                `json:"nonce,omitempty" mapstructure:"nonce,omitempty"`
 	logger              *logger.WrappedLogger `json:"-"`
 }
 
