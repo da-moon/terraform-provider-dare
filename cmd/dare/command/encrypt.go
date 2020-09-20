@@ -8,11 +8,11 @@ import (
 	"os"
 	"strings"
 
+	dare "github.com/da-moon/go-dare"
+	model "github.com/da-moon/go-dare/model"
 	logger "github.com/da-moon/go-logger"
 	primitives "github.com/da-moon/go-primitives"
 	urandom "github.com/da-moon/go-urandom"
-	dare "github.com/da-moon/terraform-provider-dare/pkg/dare"
-	model "github.com/da-moon/terraform-provider-dare/pkg/model"
 	prettyjson "github.com/hokaccha/go-prettyjson"
 	cli "github.com/mitchellh/cli"
 )

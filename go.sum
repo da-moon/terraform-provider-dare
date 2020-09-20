@@ -87,6 +87,8 @@ github.com/coreos/go-systemd v0.0.0-20181012123002-c6f51f82210d/go.mod h1:F5haX7
 github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f/go.mod h1:E3G3o1h8I7cfcXa63jLwjI0eiQQMgzzUDFVpN/nH/eA=
 github.com/da-moon/go-codec v0.0.1 h1:c5H+GzSEPcdC29VDjyDMXaZeiTN/VqDtIRJIfC8Ulrw=
 github.com/da-moon/go-codec v0.0.1/go.mod h1:R0oBtAsqOXodb6enVJqp/dZEW31bpugw61VMy7EDW7c=
+github.com/da-moon/go-dare v0.0.1 h1:XfOV9ZbMrF6xMbnN6vuFdTkFnKrc4M9hm+K2CHITsso=
+github.com/da-moon/go-dare v0.0.1/go.mod h1:OFtO/4cto0BrKuzLkDlu6TSlbOsp7dfVqDG63TWQMB4=
 github.com/da-moon/go-files v0.0.1 h1:gcud+26V8LE7xJYI5CZE9Enh5DCZtOewuvJgJPLkaWk=
 github.com/da-moon/go-files v0.0.1/go.mod h1:QMN95POiT8/0vcM9T2CyP9JqX7eTA1lcnZk/V7aIK4c=
 github.com/da-moon/go-files v0.0.2 h1:bTw4aSbARfyJy+jiBpIrJF3DlC/bDvvNKT3z+MIVo04=
@@ -99,6 +101,8 @@ github.com/da-moon/go-primitives v0.0.4 h1:pouH0jmU0ufW7868xQWUvqPBduyeqDi7LRaA2
 github.com/da-moon/go-primitives v0.0.4/go.mod h1:WJFJSBNez0KzaTJrzg7Bg9rfiQvqvhkY99H60I/7zwU=
 github.com/da-moon/go-semaphore v0.0.2 h1:8dqpzgB3CfMk+4eJ9T8NB598bJFi2nWvgNG8UqJLBMM=
 github.com/da-moon/go-semaphore v0.0.2/go.mod h1:u/OX05eIHfEnBBabkCKbG2lod950fnyE6X8RRC+zMhA=
+github.com/da-moon/go-stream v0.0.1 h1:0tRREaUmZXnz0U63H/RUkHLOFF3WAGSVCzaie/tRjns=
+github.com/da-moon/go-stream v0.0.1/go.mod h1:wxXU0U7Ljg0Cav8/gH9Q6f/I/zAnXWI2ZXrUdyr5M34=
 github.com/da-moon/go-test v0.0.1 h1:8ejIFf3fHNt52jQMZ8OFMgSO3CqZQPjpbD/Xvfh/Y4A=
 github.com/da-moon/go-test v0.0.1/go.mod h1:TLnzLAcWNmM+57vC98QQBrdJJYR4qLUnAtJ1tPgLDH0=
 github.com/da-moon/go-urandom v0.0.1 h1:qwaZvmLRP+0X57dZwKgSLnvUW3CrHaEpqjb7x9EtP/4=
@@ -303,6 +307,8 @@ github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0/go.mod h1:1NbS8ALr
 github.com/keybase/go-crypto v0.0.0-20161004153544-93f5b35093ba/go.mod h1:ghbZscTyKdM07+Fw3KSi0hcJm+AlEUWj8QLlPtijN/M=
 github.com/kisielk/errcheck v1.2.0/go.mod h1:/BMXB+zMLi60iA8Vv6Ksmxu/1UDYcXs4uQLJ+jE2L00=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
+github.com/klauspost/cpuid v1.2.3 h1:CCtW0xUnWGVINKvE/WWOYKdsPV6mawAtvQuSl8guwQs=
+github.com/klauspost/cpuid v1.2.3/go.mod h1:Pj4uuM528wm8OyEC2QMXAi2YiTZ96dNQPGgoMS4s3ek=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515/go.mod h1:+0opPa2QZZtGFBFZlji/RkVcI2GknAs/DXo4wKdlNEc=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
@@ -347,6 +353,10 @@ github.com/miekg/dns v1.0.8/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nr
 github.com/miekg/dns v1.0.14/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
 github.com/miekg/dns v1.1.26 h1:gPxPSwALAeHJSjarOs00QjVdV9QoBvc1D2ujQUr5BzU=
 github.com/miekg/dns v1.1.26/go.mod h1:bPDLeHnStXmXAq1m/Ch/hvfNHr14JKNPMBo3VZKjuso=
+github.com/minio/md5-simd v1.1.0 h1:QPfiOqlZH+Cj9teu0t9b1nTBfPbyTl16Of5MeuShdK4=
+github.com/minio/md5-simd v1.1.0/go.mod h1:XpBqgZULrMYD3R+M28PcmP0CkI7PEMzB3U77ZrKZ0Gw=
+github.com/minio/sha256-simd v0.1.1 h1:5QHSlgo3nt5yKOJrC7W8w7X+NFl8cMPZm96iu8kKUJU=
+github.com/minio/sha256-simd v0.1.1/go.mod h1:B5e1o+1/KgNmWrSQK08Y6Z1Vb5pwIktudl0J58iy0KM=
 github.com/mitchellh/cli v1.0.0/go.mod h1:hNIlj7HEI86fIcpObd7a0FcrxTWetlwJDGcceTlRvqc=
 github.com/mitchellh/cli v1.1.0/go.mod h1:xcISNoH86gajksDmfB23e/pu+B+GeFRMYmoHXxx3xhI=
 github.com/mitchellh/cli v1.1.1 h1:J64v/xD7Clql+JVKSvkYojLOXu1ibnY9ZjGLwSt/89w=

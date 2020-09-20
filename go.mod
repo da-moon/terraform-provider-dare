@@ -4,9 +4,11 @@ go 1.15
 
 require (
 	github.com/da-moon/go-codec v0.0.1
-	github.com/da-moon/go-files v0.0.2
+	github.com/da-moon/go-dare v0.0.1
+	github.com/da-moon/go-files v0.0.2 // indirect
 	github.com/da-moon/go-logger v0.0.3
 	github.com/da-moon/go-primitives v0.0.4
+	github.com/da-moon/go-stream v0.0.1
 	github.com/da-moon/go-urandom v0.0.1
 	github.com/da-moon/version v0.0.0-20200911184515-f6b53b29feb0
 	github.com/go-stack/stack v1.8.0 // indirect
@@ -16,8 +18,8 @@ require (
 	github.com/mitchellh/cli v1.1.1
 	github.com/mitchellh/mapstructure v1.3.3 // indirect
 	github.com/palantir/stacktrace v0.0.0-20161112013806-78658fd2d177
-	github.com/stretchr/testify v1.6.1
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+	github.com/stretchr/testify v1.6.1 // indirect
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
 	golang.org/x/sys v0.0.0-20200915084602-288bc346aa39 // indirect
 	golang.org/x/text v0.3.3 // indirect

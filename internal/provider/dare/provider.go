@@ -7,7 +7,7 @@ import (
 
 	logger "github.com/da-moon/go-logger"
 	urandom "github.com/da-moon/go-urandom"
-	model "github.com/da-moon/terraform-provider-dare/pkg/model"
+	model "github.com/da-moon/go-dare/model"
 	schema "github.com/hashicorp/terraform/helper/schema"
 	terraform "github.com/hashicorp/terraform/terraform"
 	"github.com/palantir/stacktrace"
