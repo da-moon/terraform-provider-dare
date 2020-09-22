@@ -1,12 +1,11 @@
 package dare
 
 import (
-	"github.com/da-moon/go-dare/model"
+	//	"github.com/da-moon/go-dare/model"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func dataSourceEncryptArtifact() *schema.Resource {
-	model.EncryptRequest{}
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"path": {

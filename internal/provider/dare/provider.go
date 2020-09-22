@@ -3,11 +3,10 @@ package dare
 import (
 	"log"
 	"os"
-	"strings"
 
+	model "github.com/da-moon/go-dare/model"
 	logger "github.com/da-moon/go-logger"
 	urandom "github.com/da-moon/go-urandom"
-	model "github.com/da-moon/go-dare/model"
 	schema "github.com/hashicorp/terraform/helper/schema"
 	terraform "github.com/hashicorp/terraform/terraform"
 	"github.com/palantir/stacktrace"
@@ -18,17 +17,16 @@ func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"key": {
-				Type:      schema.TypeString,
-				Sensitive: true,
-				Optional: true,
-				Description: "hex encoded 32 byte key string used for encryption/decryption"
-
+				Type:        schema.TypeString,
+				Sensitive:   true,
+				Optional:    true,
+				Description: "hex encoded 32 byte key string used for encryption/decryption",
 			},
 			"key_file": {
-				Type:      schema.TypeString,
-				Sensitive: false,
-				Optional: true,
-				Description: "file containing a hex encoded 32 byte key string used for encryption/decryption"
+				Type:        schema.TypeString,
+				Sensitive:   false,
+				Optional:    true,
+				Description: "file containing a hex encoded 32 byte key string used for encryption/decryption",
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
@@ -42,7 +40,6 @@ func providerConfigure(data *schema.ResourceData) (interface{}, error) {
 	key := data.Get("key").(string)
 	keyFile := data.Get("key_file").(string)
 	sink := logger.NewLevelFilter(
-		logger.WithMinLevel(strings.ToUpper(logLevel)),
 		logger.WithWriter(logger.NewGatedWriter(os.Stderr)),
 	)
 	l := log.New(sink, "", log.LstdFlags)
