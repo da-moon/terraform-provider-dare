@@ -16,7 +16,3 @@ tasks:
       git checkout 2020.1.4 &&
       go get &&
       go install
-
-vscode:
-  extensions:
-    - vscodevim.vim@1.16.0:/5VFvnA8Qrf16ESjAohurw==

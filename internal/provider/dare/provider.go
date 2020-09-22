@@ -4,13 +4,14 @@ import (
 	"log"
 	"os"
 
-	model "github.com/da-moon/go-dare/model"
-	logger "github.com/da-moon/go-logger"
-	urandom "github.com/da-moon/go-urandom"
-	schema "github.com/hashicorp/terraform/helper/schema"
-	stacktrace "github.com/palantir/stacktrace"
+	"github.com/da-moon/go-dare/model"
+	"github.com/da-moon/go-logger"
+	"github.com/da-moon/go-urandom"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/palantir/stacktrace"
 )
 
+// Provider ...
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
