@@ -24,6 +24,17 @@ clean:
 	- $(call print_running_target)
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) go-clean
 	- $(call print_completed_target)
+.SILENT: install
+.PHONY: install
+install: build
+	- $(call print_running_target)
+	- $(eval name=$(PROJECT_NAME))
+	- $(eval command=$(RM) ~/.terraform.d/plugins/$(name) )
+	- $(eval command=&& $(MKDIR) ~/.terraform.d/plugins )
+	- $(eval command=&& $(CP) bin/$(name) ~/.terraform.d/plugins/$(name))
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="${command}"
+	- $(call print_completed_target)
+
 
 .PHONY: dare
 .SILENT:dare

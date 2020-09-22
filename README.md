@@ -1,15 +1,16 @@
 # terraform-provider-dare
 
-Data at rest encryption terraform provider
+The Terraform Encryption provider is a plugin for Terraform that allows for encryption/decryption of artifacts. think of it as `ansible-vault` in terraform provider format. 
 
-## Dare binary
+While I have used [`anubis-vault`](https://github.com/da-moon/anubis-vault) for encrypting artifacts like certificates in-production for +6 months which is backed by the same [library](https://github.com/da-moon/go-dare) as this provider, I make no guarantees. Use at your own risk.
 
-```bash
-bin/dare encrypt -input=./foo -master-key=$(bin/dare keygen)
-```
+## Quick Starts
 
-## Env vars
 
-- `DARE_DEMO_SIZE`
-- `DARE_DEMO_PATH`
-- `DARE_MASTER_KEY`
+## Documentation
+
+Full, comprehensive documentation is available on the Terraform website:
+
+## references
+
+- https://www.terraform.io/docs/registry/providers/docs.html

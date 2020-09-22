@@ -1,12 +1,14 @@
-package dare
+package provider
 
 import (
 	"os"
+	"strconv"
+	"time"
 
-	"github.com/da-moon/go-dare"
-	"github.com/da-moon/go-dare/model"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/palantir/stacktrace"
+	dare "github.com/da-moon/go-dare"
+	model "github.com/da-moon/go-dare/model"
+	schema "github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	stacktrace "github.com/palantir/stacktrace"
 )
 
 func resourceEncryptArtifact() *schema.Resource {
@@ -52,9 +54,19 @@ func resourceEncryptArtifactCreate(d *schema.ResourceData, m interface{}) error 
 	output := d.Get("output_dir").(string)
 	regex := d.Get("regex").(string)
 	key := m.(model.Key)
+	err := key.Sanitize()
+	if err != nil {
+		err = stacktrace.Propagate(err, "could not sanitize key")
+		return err
+	}
 	r, err := key.NewEncryptRequest(path, output, regex)
 	if err != nil {
 		err = stacktrace.Propagate(err, "could not create encryption request")
+		return err
+	}
+	err = r.Sanitize()
+	if err != nil {
+		err = stacktrace.Propagate(err, "could not sanitize encryption request")
 		return err
 	}
 	result, err := dare.EncryptFile(r)
@@ -77,10 +89,11 @@ func resourceEncryptArtifactCreate(d *schema.ResourceData, m interface{}) error 
 		err = stacktrace.Propagate(err, "could not set encrypted_artifacts value .input : '%s' output_dir : '%s' regex : '%s'", path, output, regex)
 		return err
 	}
+	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 	return nil
 }
 
-// resourceEncryptArtifactUpdate deletes all encrypted files and re-encryptes (create) them
+// resourceEncryptArtifactUpdate deletes all encrypted files and re-encrypts (create) them
 func resourceEncryptArtifactUpdate(d *schema.ResourceData, m interface{}) error {
 	err := resourceEncryptArtifactDelete(d, m)
 	if err != nil {
@@ -90,9 +103,11 @@ func resourceEncryptArtifactUpdate(d *schema.ResourceData, m interface{}) error 
 	if err != nil {
 		stacktrace.Propagate(err, "could not create resource")
 	}
+	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 	return nil
 }
 
+//  deletes all encrypted files
 func resourceEncryptArtifactDelete(d *schema.ResourceData, m interface{}) error {
 	enc := d.Get("encrypted_artifacts").(map[string]model.Hash)
 	if enc == nil {
@@ -103,6 +118,7 @@ func resourceEncryptArtifactDelete(d *schema.ResourceData, m interface{}) error 
 		// optimistic deletion
 		os.Remove(k)
 	}
+	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 	return nil
 }
 
