@@ -7,20 +7,18 @@ endif
 fatal=fatal: No names found, cannot describe anything.
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
 SELF_DIR := $(dir $(THIS_FILE))
-GO_TARGET = $(notdir $(patsubst %/,%,$(dir $(wildcard ./cmd/*/.))))
+GO_TARGET = $(PROJECT_NAME)
 GO_BUILD_WINDOWS_TARGETS = $(GO_TARGET:%=go-build-windows-%)
 GO_BUILD_DARWIN_TARGETS = $(GO_TARGET:%=go-build-darwin-%)
 GO_BUILD_LINUX_TARGETS = $(GO_TARGET:%=go-build-linux-%)
 GO_BUILD_TARGETS = $(GO_TARGET:%=go-build-%)
 GO_BUILD_OS_TARGETS = $(GO_BUILD_WINDOWS_TARGETS) $(GO_BUILD_DARWIN_TARGETS) $(GO_BUILD_LINUX_TARGETS)
-.PHONY: $(GO_BUILD_TARGETS) $(GO_BUILD_OS_TARGETS)
+.PHONY :  $(GO_BUILD_TARGETS) $(GO_BUILD_OS_TARGETS)
 .SILENT: $(GO_BUILD_TARGETS) $(GO_BUILD_OS_TARGETS) 
-CGO=0
-GO_ARCHITECTURE=amd64
 .PHONY: go-build full-build build-darwin build-linux build-windows go-clean go-dependancy go
 .SILENT: go-build full-build build-darwin build-linux build-windows go-clean go-dependancy go
 go:
-	- $(info  $(GO_BUILD_TARGETS) $(GO_BUILD_OS_TARGETS))
+	- $(info $(parent) $(GO_BUILD_TARGETS) $(GO_BUILD_OS_TARGETS))
 
 go-build: go-clean go-dependancy 
 	- $(call print_running_target)
@@ -109,7 +107,7 @@ ifneq (${VERSION}, )
 	- $(eval command= ${command} -X github.com/da-moon/version.Version=${VERSION} )
 endif
 	- $(eval command= ${command} -X github.com/da-moon/version.Revision=${REVISION}' )
-	- $(eval command= ${command} -o .$(PSEP)bin$(PSEP)${name} .$(PSEP)cmd$(PSEP)${name} )
+	- $(eval command= ${command} -o .$(PSEP)bin$(PSEP)${name} $(PWD) )
     ifeq ($(DOCKER_ENV),true)
 	- @$(MAKE) --no-print-directory \
 	 -f $(THIS_FILE) shell \
@@ -136,7 +134,7 @@ $(GO_BUILD_OS_TARGETS):
 	- $(eval command= ${command} GOARCH=${GO_ARCHITECTURE})
 	- $(eval command= ${command} GOOS=${GOOS})
 	- $(eval command= ${command} go build -a -installsuffix cgo \
-			-o $(PWD)$(PSEP)bin$(PSEP)$(GOOS)$(PSEP)${name} $(PWD)$(PSEP)cmd$(PSEP)${name} \
+			-o $(PWD)$(PSEP)bin$(PSEP)$(GOOS)$(PSEP)${name} $(PWD) \
 		)
     ifeq ($(DOCKER_ENV),true)
 	- @$(MAKE) --no-print-directory \

@@ -5,6 +5,8 @@ DELAY:=
 GO_PKG:=github.com/da-moon/terraform-provider-dare
 GO_IMAGE=golang:buster
 MOD=on
+CGO=
+GO_ARCHITECTURE=
 # variables for demo
 LOG_LEVEL=TRACE
 FILE_SIZE:=5

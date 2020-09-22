@@ -8,12 +8,10 @@ import (
 	logger "github.com/da-moon/go-logger"
 	urandom "github.com/da-moon/go-urandom"
 	schema "github.com/hashicorp/terraform/helper/schema"
-	terraform "github.com/hashicorp/terraform/terraform"
-	"github.com/palantir/stacktrace"
+	stacktrace "github.com/palantir/stacktrace"
 )
 
-// Provider ...
-func Provider() terraform.ResourceProvider {
+func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"key": {
@@ -29,8 +27,8 @@ func Provider() terraform.ResourceProvider {
 				Description: "file containing a hex encoded 32 byte key string used for encryption/decryption",
 			},
 		},
-		DataSourcesMap: map[string]*schema.Resource{
-			// "encrypt_artifact": dataSourceEncryptedFile(),
+		ResourcesMap: map[string]*schema.Resource{
+			"encrypt_artifact": resourceEncryptArtifact(),
 		},
 		ConfigureFunc: providerConfigure,
 	}

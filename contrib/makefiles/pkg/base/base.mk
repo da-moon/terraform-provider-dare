@@ -40,6 +40,7 @@ P_OP :=(
 P_CL :=)
 
 PSEP = $(strip $(SEP))
+PROJECT_NAME := $(notdir $(CURDIR))
 PWD ?= $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 # ${ } is a space
 ${space} := ${space}
